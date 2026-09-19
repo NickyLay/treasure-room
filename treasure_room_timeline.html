@@ -163,7 +163,7 @@ button:disabled{
   font-weight:800;
   line-height:1.5;
 }
-.hidden{display:none}
+.hidden{display:none !important}
 @media(max-width:600px){
   body{padding:14px}
   h1{font-size:20px}
@@ -210,7 +210,7 @@ button:disabled{
     </div>
   </form>
 
-  <div id="successMessage" class="success hidden">
+  <div id="successMessage" class="success hidden" aria-hidden="true">
     <div class="recovery-title">LOG DIGITAL TELAH BERHASIL DIPULIHKAN.</div>
     <div class="recovery-lines">
       <div>Rekaman CCTV tidak dapat dipulihkan.</div>
@@ -376,6 +376,7 @@ button:disabled{
     if(correctRows === answerKey.length){
       message.textContent = "";
       successMessage.classList.remove("hidden");
+      successMessage.setAttribute("aria-hidden", "false");
       checkButton.disabled = true;
       checkButton.textContent = "TIMELINE VERIFIED";
       return;
@@ -397,6 +398,7 @@ button:disabled{
     attemptCount.textContent = "0";
     message.textContent = "";
     successMessage.classList.add("hidden");
+    successMessage.setAttribute("aria-hidden", "true");
 
     checkButton.disabled = false;
     checkButton.textContent = "CHECK TIMELINE";
