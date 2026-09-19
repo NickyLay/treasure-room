@@ -313,9 +313,6 @@ button:disabled{
   });
 
   let attempts = 0;
-  // Initial state: recovery/audio content is locked until all 14 rows are correct.
-  successMessage.classList.add("hidden");
-  successMessage.setAttribute("aria-hidden", "true");
 
   const form = document.getElementById("timelineForm");
   const attemptCount = document.getElementById("attemptCount");
@@ -323,6 +320,10 @@ button:disabled{
   const successMessage = document.getElementById("successMessage");
   const checkButton = document.getElementById("checkButton");
   const resetButton = document.getElementById("resetButton");
+
+  // Initial state: recovery/audio content is locked until all 14 rows are correct.
+  successMessage.classList.add("hidden");
+  successMessage.setAttribute("aria-hidden", "true");
 
   form.addEventListener("submit", function(event){
     event.preventDefault();
