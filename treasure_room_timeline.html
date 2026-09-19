@@ -182,7 +182,7 @@ button:disabled{
       </p>
     </div>
     <div class="attempts">
-      ATTEMPTS: <span id="attemptCount">0</span> / 3
+      ATTEMPTS: <span id="attemptCount">0</span> / 5
     </div>
   </div>
 
@@ -211,8 +211,46 @@ button:disabled{
   </form>
 
   <div id="successMessage" class="success hidden">
-    ✓ TIMELINE VERIFIED<br>
-    The timeline is correct. Evidence Room unlocked.
+    <div class="recovery-title">LOG DIGITAL TELAH BERHASIL DIPULIHKAN.</div>
+    <div class="recovery-lines">
+      <div>Rekaman CCTV tidak dapat dipulihkan.</div>
+      <div>2 rekaman audio dapat dipulihkan.</div>
+    </div>
+    <div class="audio-intro">Klik untuk mengakses audio tersebut.</div>
+
+    <div class="audio-buttons">
+      <button type="button" class="audio-button" data-audio="audio1">
+        🎧 REKAMAN AUDIO 01
+      </button>
+      <button type="button" class="audio-button" data-audio="audio2">
+        🎧 REKAMAN AUDIO 02
+      </button>
+    </div>
+
+    <div id="audioPanel" class="audio-panel hidden">
+      <div class="audio-label" id="audioLabel">REKAMAN AUDIO</div>
+      <audio id="audioPlayer" controls preload="metadata"></audio>
+    </div>
+  </div>
+    <div class="audio-intro">Klik untuk mengakses audio tersebut.</div>
+
+    <div class="audio-buttons">
+      <button type="button" class="audio-button" data-audio="audio1">
+        🎧 REKAMAN AUDIO 01
+      </button>
+      <button type="button" class="audio-button" data-audio="audio2">
+        🎧 REKAMAN AUDIO 02
+      </button>
+    </div>
+
+    <div id="audioPanel" class="audio-panel hidden">
+      <div class="audio-label" id="audioLabel">REKAMAN AUDIO</div>
+      <audio id="audioPlayer" controls preload="metadata"></audio>
+      <div class="audio-note" id="audioNote">
+        Jika audio belum tersedia, upload file audio ke repository GitHub dengan nama
+        <strong>audio1.mp3</strong> dan <strong>audio2.mp3</strong>.
+      </div>
+    </div>
   </div>
 </div>
 
@@ -229,29 +267,29 @@ button:disabled{
   */
 
   const answerKey = [
-    {day:"Senin",  in:"08.40", out:"08.55", person:"Maid",                    status:"Authorized"},
-    {day:"Senin",  in:"09.05", out:"09.12", person:"Sekuriti",               status:"Authorized"},
+    {day:"Senin",  in:"08.40", out:"08.55", person:"Maid",                   status:"Authorized"},
+    {day:"Senin",  in:"09.05", out:"09.12", person:"Security",               status:"Authorized"},
     {day:"Senin",  in:"11.00", out:"11.10", person:"Kurator",                status:"Authorized"},
-    {day:"Senin",  in:"11.20", out:"11.25", person:"Sekuriti",               status:"Unauthorized"},
-    {day:"Senin",  in:"12.15", out:"12.30", person:"Tuan Cuthbert",          status:"Authorized"},
-    {day:"Senin",  in:"14.00", out:"14.15", person:"Maid",                    status:"Authorized"},
-    {day:"Senin",  in:"14.20", out:"14.30", person:"Sekuriti",               status:"Authorized"},
-    {day:"Senin",  in:"18.30", out:"21.00", person:"PIC Auction + Kurator",  status:"Authorized"},
-    {day:"Senin",  in:"19.30", out:"19.40", person:"Sekuriti",               status:"Authorized"},
-    {day:"Selasa", in:"07.40", out:"07.55", person:"Maid",                    status:"Authorized"},
-    {day:"Selasa", in:"08.05", out:"08.12", person:"Sekuriti",               status:"Authorized"},
-    {day:"Selasa", in:"09.00", out:"10.20", person:"PIC Auction + Sekuriti", status:"Authorized"},
-    {day:"Selasa", in:"10.27", out:"10.32", person:"Sekuriti",               status:"Unauthorized"},
-    {day:"Selasa", in:"10.42", out:"11.00", person:"PIC Auction + Sekuriti", status:"Authorized"}
+    {day:"Senin",  in:"11.20", out:"11.25", person:"Security",               status:"Unauthorized"},
+    {day:"Senin",  in:"12.15", out:"12.30", person:"Cuthbert",               status:"Authorized"},
+    {day:"Senin",  in:"14.00", out:"14.15", person:"Maid",                   status:"Authorized"},
+    {day:"Senin",  in:"14.20", out:"14.30", person:"Security",               status:"Authorized"},
+    {day:"Senin",  in:"18.30", out:"21.00", person:"PIC Auction + Kurator", status:"Authorized"},
+    {day:"Senin",  in:"19.30", out:"19.40", person:"Security",               status:"Authorized"},
+    {day:"Selasa", in:"07.40", out:"07.55", person:"Maid",                   status:"Authorized"},
+    {day:"Selasa", in:"08.05", out:"08.12", person:"Security",               status:"Authorized"},
+    {day:"Selasa", in:"10.00", out:"10.20", person:"PIC Auction + Security", status:"Authorized"},
+    {day:"Selasa", in:"10.27", out:"10.32", person:"Security",               status:"Unauthorized"},
+    {day:"Selasa", in:"10.42", out:"11.00", person:"PIC Auction + Security", status:"Authorized"}
   ];
 
   const people = [
     "Maid",
-    "Sekuriti",
+    "Security",
     "Kurator",
-    "Tuan Cuthbert",
+    "Cuthbert",
     "PIC Auction + Kurator",
-    "PIC Auction + Sekuriti"
+    "PIC Auction + Security"
   ];
 
   const statuses = ["Authorized","Unauthorized"];
@@ -305,7 +343,7 @@ button:disabled{
   form.addEventListener("submit", function(event){
     event.preventDefault();
 
-    if(attempts >= 3) return;
+    if(attempts >= 5) return;
 
     attempts++;
     attemptCount.textContent = attempts;
@@ -343,7 +381,7 @@ button:disabled{
       return;
     }
 
-    if(attempts >= 3){
+    if(attempts >= 5){
       message.textContent =
         `${correctRows} / ${answerKey.length} rows correct. Attempts exhausted.`;
       checkButton.disabled = true;
@@ -363,6 +401,12 @@ button:disabled{
     checkButton.disabled = false;
     checkButton.textContent = "CHECK TIMELINE";
 
+    document.getElementById("audioPanel").classList.add("hidden");
+    const player = document.getElementById("audioPlayer");
+    player.pause();
+    player.removeAttribute("src");
+    player.load();
+
     [...body.querySelectorAll("tr[data-index]")].forEach(tr=>{
       tr.classList.remove("correct","wrong");
       tr.querySelector(".result").textContent = "";
@@ -371,6 +415,27 @@ button:disabled{
         select.disabled = false;
         select.value = "";
       });
+    });
+  });
+
+  // Audio files are expected to sit in the same GitHub Pages folder
+  // as this HTML file:
+  // audio1.mp3
+  // audio2.mp3
+  const audioPanel = document.getElementById("audioPanel");
+  const audioPlayer = document.getElementById("audioPlayer");
+  const audioLabel = document.getElementById("audioLabel");
+
+  document.querySelectorAll(".audio-button").forEach(button=>{
+    button.addEventListener("click", function(){
+      const id = button.dataset.audio;
+      const file = id === "audio1" ? "audio1.mp3" : "audio2.mp3";
+      const number = id === "audio1" ? "01" : "02";
+
+      audioLabel.textContent = "REKAMAN AUDIO " + number;
+      audioPlayer.src = file;
+      audioPanel.classList.remove("hidden");
+      audioPlayer.play().catch(()=>{});
     });
   });
 })();
