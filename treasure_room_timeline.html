@@ -216,6 +216,7 @@ button:disabled{
       <div>Rekaman CCTV tidak dapat dipulihkan.</div>
       <div>2 rekaman audio dapat dipulihkan.</div>
     </div>
+
     <div class="audio-intro">Klik untuk mengakses audio tersebut.</div>
 
     <div class="audio-buttons">
@@ -230,26 +231,6 @@ button:disabled{
     <div id="audioPanel" class="audio-panel hidden">
       <div class="audio-label" id="audioLabel">REKAMAN AUDIO</div>
       <audio id="audioPlayer" controls preload="metadata"></audio>
-    </div>
-  </div>
-    <div class="audio-intro">Klik untuk mengakses audio tersebut.</div>
-
-    <div class="audio-buttons">
-      <button type="button" class="audio-button" data-audio="audio1">
-        🎧 REKAMAN AUDIO 01
-      </button>
-      <button type="button" class="audio-button" data-audio="audio2">
-        🎧 REKAMAN AUDIO 02
-      </button>
-    </div>
-
-    <div id="audioPanel" class="audio-panel hidden">
-      <div class="audio-label" id="audioLabel">REKAMAN AUDIO</div>
-      <audio id="audioPlayer" controls preload="metadata"></audio>
-      <div class="audio-note" id="audioNote">
-        Jika audio belum tersedia, upload file audio ke repository GitHub dengan nama
-        <strong>audio1.mp3</strong> dan <strong>audio2.mp3</strong>.
-      </div>
     </div>
   </div>
 </div>
@@ -332,6 +313,9 @@ button:disabled{
   });
 
   let attempts = 0;
+  // Initial state: recovery/audio content is locked until all 14 rows are correct.
+  successMessage.classList.add("hidden");
+  successMessage.setAttribute("aria-hidden", "true");
 
   const form = document.getElementById("timelineForm");
   const attemptCount = document.getElementById("attemptCount");
