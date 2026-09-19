@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treasure Room — Timeline</title>
+<style>
+:root{
+  --ink:#20242b;
+  --muted:#69707d;
+  --line:#cfd4dc;
+  --soft:#f4f5f7;
+  --ok:#eaf7ef;
+  --ok-line:#8fc3a0;
+  --bad:#fff0f0;
+  --bad-line:#df9b9b;
+  --accent:#4f46e5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:24px;
+  background:#fff;
+  color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.app{
+  max-width:900px;
+  margin:0 auto;
+}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+h1{
+  margin:0 0 5px;
+  font-size:24px;
+  letter-spacing:.2px;
+}
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.45;
+}
+.attempts{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 13px;
+  font-size:13px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.table-wrap{
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:auto;
+}
+table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+  background:#fff;
+}
+th{
+  background:var(--soft);
+  padding:10px 9px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  text-align:center;
+}
+td{
+  padding:7px 8px;
+  border-bottom:1px solid #e7e9ed;
+  font-size:14px;
+}
+tr:last-child td{border-bottom:0}
+.day-row td{
+  background:#eceef1;
+  font-weight:800;
+  text-align:center;
+  padding:8px;
+}
+.number{
+  width:48px;
+  text-align:center;
+  font-weight:800;
+  color:#606773;
+}
+.time{
+  width:105px;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+select{
+  width:100%;
+  min-height:40px;
+  padding:7px 9px;
+  border:1px solid #cdd2da;
+  border-radius:8px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+}
+select:focus{
+  outline:2px solid var(--accent);
+  outline-offset:1px;
+}
+.correct{background:var(--ok)}
+.correct select{border-color:var(--ok-line);background:#f8fdf9}
+.wrong{background:var(--bad)}
+.wrong select{border-color:var(--bad-line);background:#fffafa}
+.result{
+  width:42px;
+  text-align:center;
+  font-size:17px;
+  font-weight:900;
+}
+.actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+button{
+  min-height:44px;
+  border:0;
+  border-radius:9px;
+  padding:10px 17px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+}
+#check{
+  background:var(--accent);
+  color:white;
+}
+#reset{
+  background:#eceef1;
+  color:#303640;
+}
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+.message{
+  color:#555e6b;
+  font-size:13px;
+  font-weight:700;
+}
+.success{
+  margin-top:15px;
+  padding:15px;
+  border:1px solid #9bcaa9;
+  border-radius:10px;
+  background:var(--ok);
+  color:#205c38;
+  font-weight:800;
+  line-height:1.5;
+}
+.hidden{display:none}
+@media(max-width:600px){
+  body{padding:14px}
+  h1{font-size:20px}
+  .subtitle{font-size:13px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>RECONSTRUCT THE TIMELINE</h1>
+      <p class="subtitle">
+        Determine who entered the Treasure Room and whether each entry was authorized.
+      </p>
+    </div>
+    <div class="attempts">
+      ATTEMPTS: <span id="attemptCount">0</span> / 3
+    </div>
+  </div>
+
+  <form id="timelineForm">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Jam Masuk</th>
+            <th>Jam Keluar</th>
+            <th>Orang</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="timelineBody"></tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button id="checkButton" type="submit">CHECK TIMELINE</button>
+      <button id="resetButton" type="button">RESET</button>
+      <span id="message" class="message" aria-live="polite"></span>
+    </div>
+  </form>
+
+  <div id="successMessage" class="success hidden">
+    ✓ TIMELINE VERIFIED<br>
+    The timeline is correct. Evidence Room unlocked.
+  </div>
+</div>
+
+<script>
+(function(){
+  /*
+    ==========================================================
+    ANSWER KEY
+    ==========================================================
+    IMPORTANT:
+    The times below are taken directly from your supplied table.
+    Change ONLY the "person" and "status" values if you later
+    update your final Treasure Room answer key.
+  */
+
+  const answerKey = [
+    {day:"Senin",  in:"08.40", out:"08.55", person:"Maid",                    status:"Authorized"},
+    {day:"Senin",  in:"09.05", out:"09.12", person:"Sekuriti",               status:"Authorized"},
+    {day:"Senin",  in:"11.00", out:"11.10", person:"Kurator",                status:"Authorized"},
+    {day:"Senin",  in:"11.20", out:"11.25", person:"Sekuriti",               status:"Unauthorized"},
+    {day:"Senin",  in:"12.15", out:"12.30", person:"Tuan Cuthbert",          status:"Authorized"},
+    {day:"Senin",  in:"14.00", out:"14.15", person:"Maid",                    status:"Authorized"},
+    {day:"Senin",  in:"14.20", out:"14.30", person:"Sekuriti",               status:"Authorized"},
+    {day:"Senin",  in:"18.30", out:"21.00", person:"PIC Auction + Kurator",  status:"Authorized"},
+    {day:"Senin",  in:"19.30", out:"19.40", person:"Sekuriti",               status:"Authorized"},
+    {day:"Selasa", in:"07.40", out:"07.55", person:"Maid",                    status:"Authorized"},
+    {day:"Selasa", in:"08.05", out:"08.12", person:"Sekuriti",               status:"Authorized"},
+    {day:"Selasa", in:"09.00", out:"10.20", person:"PIC Auction + Sekuriti", status:"Authorized"},
+    {day:"Selasa", in:"10.27", out:"10.32", person:"Sekuriti",               status:"Unauthorized"},
+    {day:"Selasa", in:"10.42", out:"11.00", person:"PIC Auction + Sekuriti", status:"Authorized"}
+  ];
+
+  const people = [
+    "Maid",
+    "Sekuriti",
+    "Kurator",
+    "Tuan Cuthbert",
+    "PIC Auction + Kurator",
+    "PIC Auction + Sekuriti"
+  ];
+
+  const statuses = ["Authorized","Unauthorized"];
+
+  const body = document.getElementById("timelineBody");
+  let currentDay = "";
+
+  answerKey.forEach((row,index)=>{
+    if(row.day !== currentDay){
+      currentDay = row.day;
+      const dayRow = document.createElement("tr");
+      dayRow.className = "day-row";
+      dayRow.innerHTML = `<td colspan="6">${row.day}</td>`;
+      body.appendChild(dayRow);
+    }
+
+    const tr = document.createElement("tr");
+    tr.dataset.index = index;
+
+    tr.innerHTML = `
+      <td class="number">${index + 1}</td>
+      <td class="time">${row.in}</td>
+      <td class="time">${row.out}</td>
+      <td>
+        <select aria-label="Orang nomor ${index + 1}">
+          <option value="">Pilih orang...</option>
+          ${people.map(person => `<option value="${person}">${person}</option>`).join("")}
+        </select>
+      </td>
+      <td>
+        <select aria-label="Status nomor ${index + 1}">
+          <option value="">Pilih status...</option>
+          ${statuses.map(status => `<option value="${status}">${status}</option>`).join("")}
+        </select>
+      </td>
+      <td class="result" aria-live="polite"></td>
+    `;
+
+    body.appendChild(tr);
+  });
+
+  let attempts = 0;
+
+  const form = document.getElementById("timelineForm");
+  const attemptCount = document.getElementById("attemptCount");
+  const message = document.getElementById("message");
+  const successMessage = document.getElementById("successMessage");
+  const checkButton = document.getElementById("checkButton");
+  const resetButton = document.getElementById("resetButton");
+
+  form.addEventListener("submit", function(event){
+    event.preventDefault();
+
+    if(attempts >= 3) return;
+
+    attempts++;
+    attemptCount.textContent = attempts;
+
+    let correctRows = 0;
+
+    [...body.querySelectorAll("tr[data-index]")].forEach(tr=>{
+      const index = Number(tr.dataset.index);
+      const selects = tr.querySelectorAll("select");
+
+      const selectedPerson = selects[0].value;
+      const selectedStatus = selects[1].value;
+
+      const correct =
+        selectedPerson === answerKey[index].person &&
+        selectedStatus === answerKey[index].status;
+
+      tr.classList.remove("correct","wrong");
+      tr.classList.add(correct ? "correct" : "wrong");
+
+      const result = tr.querySelector(".result");
+      result.textContent = correct ? "✓" : "×";
+
+      if(correct){
+        correctRows++;
+        selects.forEach(select => select.disabled = true);
+      }
+    });
+
+    if(correctRows === answerKey.length){
+      message.textContent = "";
+      successMessage.classList.remove("hidden");
+      checkButton.disabled = true;
+      checkButton.textContent = "TIMELINE VERIFIED";
+      return;
+    }
+
+    if(attempts >= 3){
+      message.textContent =
+        `${correctRows} / ${answerKey.length} rows correct. Attempts exhausted.`;
+      checkButton.disabled = true;
+      return;
+    }
+
+    message.textContent =
+      `${correctRows} / ${answerKey.length} rows correct. Fix the red rows and try again.`;
+  });
+
+  resetButton.addEventListener("click", function(){
+    attempts = 0;
+    attemptCount.textContent = "0";
+    message.textContent = "";
+    successMessage.classList.add("hidden");
+
+    checkButton.disabled = false;
+    checkButton.textContent = "CHECK TIMELINE";
+
+    [...body.querySelectorAll("tr[data-index]")].forEach(tr=>{
+      tr.classList.remove("correct","wrong");
+      tr.querySelector(".result").textContent = "";
+
+      tr.querySelectorAll("select").forEach(select=>{
+        select.disabled = false;
+        select.value = "";
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
