@@ -406,8 +406,8 @@ button:disabled{
 
   // Audio files are expected to sit in the same GitHub Pages folder
   // as this HTML file:
-  // audio1.mp3
-  // audio2.mp3
+  // audio1.mp4
+  // audio2.mp4
   const audioPanel = document.getElementById("audioPanel");
   const audioPlayer = document.getElementById("audioPlayer");
   const audioLabel = document.getElementById("audioLabel");
@@ -415,7 +415,7 @@ button:disabled{
   document.querySelectorAll(".audio-button").forEach(button=>{
     button.addEventListener("click", function(){
       const id = button.dataset.audio;
-      const file = id === "audio1" ? "audio1.mp3" : "audio2.mp3";
+      const file = id === "audio1" ? "audio1.mp4" : "audio2.mp4";
       const number = id === "audio1" ? "01" : "02";
 
       audioLabel.textContent = "REKAMAN AUDIO " + number;
